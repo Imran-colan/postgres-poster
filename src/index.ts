@@ -1,5 +1,5 @@
 import logger from "jet-logger";
-
+import "dotenv/config";
 import ENV from "@src/common/constants/ENV";
 import server from "./server";
 
