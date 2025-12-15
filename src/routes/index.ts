@@ -21,7 +21,7 @@ userRouter.put(PATHS.Users.Update, UserRoutes.update);
 userRouter.delete(PATHS.Users.Delete, UserRoutes.delete);
 
 // Add UserRouter
-apiRouter.use(PATHS.Users.Base, userRouter);
+apiRouter.use(PATHS.Users._, userRouter);
 
 /******************************************************************************
                                 Export default

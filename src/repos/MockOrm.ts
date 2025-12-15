@@ -9,7 +9,7 @@ import { IUser } from "@src/models/User";
 ******************************************************************************/
 
 const DB_FILE_NAME =
-  ENV.NodeEnv === NODE_ENVS.Test ? "database.test.json" : "database.json";
+  ENV.NODE_ENV === NODE_ENVS.Test ? "database.test.json" : "database.json";
 
 /******************************************************************************
                                 Types

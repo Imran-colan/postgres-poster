@@ -27,12 +27,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Show routes called in console during development
-if (ENV.NodeEnv === NODE_ENVS.Dev) {
+if (ENV.NODE_ENV === NODE_ENVS.Dev) {
   app.use(morgan("dev"));
 }
 
 // Security
-if (ENV.NodeEnv === NODE_ENVS.Production) {
+if (ENV.NODE_ENV === NODE_ENVS.Production) {
   // eslint-disable-next-line n/no-process-env
   if (!process.env.DISABLE_HELMET) {
     app.use(helmet());
@@ -40,11 +40,11 @@ if (ENV.NodeEnv === NODE_ENVS.Production) {
 }
 
 // Add APIs, must be after middleware
-app.use(Paths.Base, BaseRouter);
+app.use(Paths._, BaseRouter);
 
 // Add error handler
 app.use((err: Error, _: Request, res: Response, next: NextFunction) => {
-  if (ENV.NodeEnv !== NODE_ENVS.Test.valueOf()) {
+  if (ENV.NODE_ENV !== NODE_ENVS.Test.valueOf()) {
     logger.err(err, true);
   }
   let status: HttpStatusCodes = HTTP_STATUS_CODES.BadRequest;

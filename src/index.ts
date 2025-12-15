@@ -8,14 +8,14 @@ import server from "./server";
 ******************************************************************************/
 
 const SERVER_START_MSG =
-  "Express server started on port: " + ENV.Port.toString();
+  "Express server started on port: " + ENV.PORT.toString();
 
 /******************************************************************************
                                   Run
 ******************************************************************************/
 
 // Start the server
-server.listen(ENV.Port, (err) => {
+server.listen(ENV.PORT, (err) => {
   if (!!err) {
     logger.err(err.message);
   } else {
