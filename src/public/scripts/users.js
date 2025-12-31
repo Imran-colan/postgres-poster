@@ -47,18 +47,22 @@ function displayUsers() {
 document.addEventListener(
   "click",
   (event) => {
-    event.preventDefault();
     var ele = event.target;
     if (ele.matches("#add-user-btn")) {
       addUser();
+      event.preventDefault();
     } else if (ele.matches(".edit-user-btn")) {
       showEditView(ele.parentNode.parentNode);
+      event.preventDefault();
     } else if (ele.matches(".cancel-edit-btn")) {
       cancelEdit(ele.parentNode.parentNode);
+      event.preventDefault();
     } else if (ele.matches(".submit-edit-btn")) {
       submitEdit(ele);
+      event.preventDefault();
     } else if (ele.matches(".delete-user-btn")) {
       deleteUser(ele);
+      event.preventDefault();
     }
   },
   false,
@@ -109,20 +113,31 @@ function cancelEdit(userEle) {
 /**
  * Submit edit.
  */
-function submitEdit(ele) {
+async function submitEdit(ele) {
   var userEle = ele.parentNode.parentNode;
   var nameInput = userEle.getElementsByClassName("name-edit-input")[0];
   var emailInput = userEle.getElementsByClassName("email-edit-input")[0];
   var id = ele.getAttribute("data-user-id");
   var created = ele.getAttribute("data-user-created");
+  var avatarInput = userEle.querySelector(".avatar-input");
+  console.log(avatarInput)
+  console.log(avatarInput?.files)
+  var avatar = avatarInput?.files?.[0];
+  var avatarMime = avatarInput?.files?.[0]?.type;
+  var avatarBase64 = await fileToBase64(avatarInput.files[0]);
+
+
   var data = {
     user: {
       id: Number(id),
       name: nameInput.value,
       email: emailInput.value,
       created: new Date(created),
+      avatar: avatarBase64,
+      avatarMime: avatarMime,
     },
   };
+  console.log(data);
   Http.put("/api/users/update", data).then(() => displayUsers());
 }
 
@@ -132,4 +147,13 @@ function submitEdit(ele) {
 function deleteUser(ele) {
   var id = ele.getAttribute("data-user-id");
   Http.delete("/api/users/delete/" + id).then(() => displayUsers());
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }

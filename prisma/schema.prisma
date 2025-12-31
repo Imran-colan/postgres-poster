@@ -13,8 +13,10 @@ datasource db {
 }
 
 model User {
-  id      Int      @id @default(autoincrement())
-  name    String
-  email   String   @unique
-  created DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  avatar     Bytes?
+  avatarMime String?
+  created    DateTime @default(now())
 }

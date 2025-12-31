@@ -58,6 +58,13 @@
         {{#each users}}
           <div class="user-display-ele">
             <div class="normal-view">
+              <div>
+                <img
+                  src="data:{{avatarMime}};base64,{{avatar}}"
+                  alt="Avatar"
+                  class="avatar-img"
+                />
+              </div>
               <div><b>Name:</b> {{name}}</div>
               <div><b>Email:</b> {{email}}</div>
               <div><b>Created:</b> {{createdFormatted}}</div>
@@ -77,6 +84,15 @@
             </div>
 
             <div class="edit-view">
+              <div>
+                Avatar:&nbsp;
+                <input
+                  type="file"
+                  id="avatar-input-{{id}}"
+                  accept="image/*"
+                  class="form-control avatar-input"
+                />
+              </div>
               <div>
                 Name:&nbsp;
                 <input

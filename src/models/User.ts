@@ -43,6 +43,8 @@ export const UserSchema = z.object({
       typeof arg === "string" || arg instanceof Date ? new Date(arg) : arg,
     z.date(),
   ),
+  avatar: z.string().optional(),
+  avatarMime: z.string().optional(),
 });
 
 export const CreateUserSchema = z.object({
