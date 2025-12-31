@@ -1,8 +1,6 @@
-import { IUser } from "@src/models/User";
+import User, { IUser, CreateUserInput } from "@src/models/User";
 import { getRandomInt } from "@src/common/util/misc";
-
-import orm from "./MockOrm";
-
+import db from "./DB";
 /******************************************************************************
                                 Functions
 ******************************************************************************/
@@ -11,75 +9,55 @@ import orm from "./MockOrm";
  * Get one user.
  */
 async function getOne(email: string): Promise<IUser | null> {
-  const db = await orm.openDb();
-  for (const user of db.users) {
-    if (user.email === email) {
-      return user;
-    }
-  }
-  return null;
+  return db.user.findUnique({
+    where: { email },
+  });
 }
 
 /**
  * See if a user with the given id exists.
  */
 async function persists(id: number): Promise<boolean> {
-  const db = await orm.openDb();
-  for (const user of db.users) {
-    if (user.id === id) {
-      return true;
-    }
+  const users = await db.user.findUnique({
+    where: { id },
+  });
+  if (!users) {
+    return false;
   }
-  return false;
+  return true;
 }
 
 /**
  * Get all users.
  */
 async function getAll(): Promise<IUser[]> {
-  const db = await orm.openDb();
-  return db.users;
+  return db.user.findMany();
 }
 
 /**
  * Add one user.
  */
-async function add(user: IUser): Promise<void> {
-  const db = await orm.openDb();
-  user.id = getRandomInt();
-  db.users.push(user);
-  return orm.saveDb(db);
+async function add(user: CreateUserInput): Promise<void> {
+  await db.user.create({ data: user });
 }
 
 /**
  * Update a user.
  */
 async function update(user: IUser): Promise<void> {
-  const db = await orm.openDb();
-  for (let i = 0; i < db.users.length; i++) {
-    if (db.users[i].id === user.id) {
-      const dbUser = db.users[i];
-      db.users[i] = {
-        ...dbUser,
-        name: user.name,
-        email: user.email,
-      };
-      return orm.saveDb(db);
-    }
-  }
+  await db.user.update({
+    where: { id: user.id },
+    data: user,
+  });
 }
 
 /**
  * Delete one user.
  */
 async function delete_(id: number): Promise<void> {
-  const db = await orm.openDb();
-  for (let i = 0; i < db.users.length; i++) {
-    if (db.users[i].id === id) {
-      db.users.splice(i, 1);
-      return orm.saveDb(db);
-    }
-  }
+  await db.user.delete({
+    where: { id },
+  });
 }
 
 // **** Unit-Tests Only **** //
@@ -88,9 +66,7 @@ async function delete_(id: number): Promise<void> {
  * Delete every user record.
  */
 async function deleteAllUsers(): Promise<void> {
-  const db = await orm.openDb();
-  db.users = [];
-  return orm.saveDb(db);
+  await db.user.deleteMany({});
 }
 
 /**
@@ -98,14 +74,10 @@ async function deleteAllUsers(): Promise<void> {
  * for now.
  */
 async function insertMult(users: IUser[] | readonly IUser[]): Promise<IUser[]> {
-  const db = await orm.openDb(),
-    usersF = [...users];
+  const usersF = [...users];
   for (const user of usersF) {
-    user.id = getRandomInt();
-    user.created = new Date();
+    await db.user.create({ data: user });
   }
-  db.users = [...db.users, ...users];
-  await orm.saveDb(db);
   return usersF;
 }
 

@@ -1,12 +1,14 @@
 import { z } from "zod";
-import { isRelationalKey } from "@src/common/util/validators";
 import { IModel } from "./common/types";
 
 export interface IUser extends IModel {
   name: string;
   email: string;
 }
-
+export interface CreateUserInput {
+  name: string;
+  email: string;
+}
 /******************************************************************************
                                  Constants
 ******************************************************************************/
@@ -41,6 +43,11 @@ export const UserSchema = z.object({
       typeof arg === "string" || arg instanceof Date ? new Date(arg) : arg,
     z.date(),
   ),
+});
+
+export const CreateUserSchema = z.object({
+  name: z.string().min(1),
+  email: z.email(),
 });
 
 /******************************************************************************
@@ -79,4 +86,5 @@ export default {
   new: __new__,
   test,
   schema: UserSchema,
+  createSchema: CreateUserSchema,
 } as const;

@@ -11,9 +11,9 @@ import z from "zod";
 ******************************************************************************/
 
 const Validators = {
-  add: parseReq({ user: User.schema }),
+  add: parseReq({ user: User.createSchema }),
   update: parseReq({ user: User.schema }),
-  delete: parseReq({ id: z.coerce.number().int().positive() }),
+  delete: parseReq({ id: z.coerce.number().int() }),
 } as const;
 
 /******************************************************************************

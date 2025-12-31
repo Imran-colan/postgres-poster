@@ -70,21 +70,21 @@ document.addEventListener(
 function addUser() {
   var nameInput = document.getElementById("name-input");
   var emailInput = document.getElementById("email-input");
+
   var data = {
     user: {
-      id: -1,
       name: nameInput.value,
       email: emailInput.value,
-      created: new Date(),
     },
   };
-  // Call api
+
   Http.post("/api/users/add", data).then(() => {
     nameInput.value = "";
     emailInput.value = "";
     displayUsers();
   });
 }
+
 
 /**
  * Show edit view.
@@ -115,7 +115,6 @@ function submitEdit(ele) {
   var emailInput = userEle.getElementsByClassName("email-edit-input")[0];
   var id = ele.getAttribute("data-user-id");
   var created = ele.getAttribute("data-user-created");
-  console.log(ele, created);
   var data = {
     user: {
       id: Number(id),

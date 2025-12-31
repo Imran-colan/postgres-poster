@@ -2,7 +2,7 @@ import { RouteError } from "@src/common/util/route-errors";
 import HTTP_STATUS_CODES from "@src/common/constants/HTTP_STATUS_CODES";
 
 import UserRepo from "@src/repos/UserRepo";
-import { IUser } from "@src/models/User";
+import { IUser, CreateUserInput } from "@src/models/User";
 
 /******************************************************************************
                                 Constants
@@ -24,7 +24,7 @@ function getAll(): Promise<IUser[]> {
 /**
  * Add one user.
  */
-function addOne(user: IUser): Promise<void> {
+function addOne(user: CreateUserInput): Promise<void> {
   return UserRepo.add(user);
 }
 
