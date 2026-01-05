@@ -11,7 +11,7 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log({ user: { name, email, avatar } });
+    onClose();
     const formData = new FormData();
     formData.append("name", name);
     formData.append("email", email);
@@ -24,7 +24,11 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
       }).then(async (res) => {
         if (!res.ok) throw new Error("Failed to add user");
         appEventEmitter.emit("event:users-mutated", {});
-        return res.json();
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(res.json());
+          }, 3000);
+        });
       });
 
     try {
@@ -32,12 +36,12 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
         loadingTitle: "Adding user…",
         successTitle: "User created",
         successDescription: "User added successfully 🎉",
-        onSuccess: () => onClose(),
         errorTitle: "User creation failed",
         errorDescription: (err) =>
           err instanceof Error ? err.message : "Unknown error",
       });
-    } catch {}
+    } catch {
+    }
   };
 
   return (

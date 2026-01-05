@@ -1,6 +1,5 @@
-import { DeleteIcon } from "@/assets/icons";
 import AddUserButton from "@/components/AddUserButton";
-import { notifyAsync } from "@/components/notifyAsync";
+import DeleteUserButton from "@/components/DeleteUserButton";
 import { subtitle, title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
 import { appEventEmitter } from "@/utils/appEventEmitter";
@@ -10,9 +9,7 @@ import {
   TableColumn,
   TableBody,
   TableRow,
-  TableCell,
-  Button,
-  Avatar,
+  TableCell, Avatar
 } from "@heroui/react";
 import { useEffect, useState } from "react";
 
@@ -24,28 +21,6 @@ interface User {
   avatar: string;
   avatarMime: string;
 }
-const deleteUser = async (id: number) => {
-  const createUserPromise = () =>
-    fetch("/api/users/delete/" + id, {
-      method: "DELETE",
-    }).then(async (res) => {
-      if (!res.ok) throw new Error("Failed to delete user");
-      appEventEmitter.emit("event:users-mutated", {});
-      return res.json();
-    });
-
-  try {
-    await notifyAsync(createUserPromise, {
-      loadingTitle: "Deleting user…",
-      successTitle: "User deleted",
-      successDescription: "User deleted successfully 🎉",
-      onSuccess: () => appEventEmitter.emit("event:users-mutated", {}),
-      errorTitle: "User deletion failed",
-      errorDescription: (err) =>
-        err instanceof Error ? err.message : "Unknown error",
-    });
-  } catch {}
-};
 export default function UserPage() {
   const [users, setUsers] = useState<User[]>([]);
 
@@ -93,16 +68,7 @@ export default function UserPage() {
               <TableCell>{user.email}</TableCell>
               <TableCell>{new Date(user.created).toDateString()}</TableCell>
               <TableCell>
-                <Button
-                  isIconOnly
-                  aria-label="Delete"
-                  color="danger"
-                  variant="flat"
-                  size="sm"
-                  onClick={() => deleteUser(user.id)}
-                >
-                  <DeleteIcon />
-                </Button>
+                <DeleteUserButton id={user.id} />
               </TableCell>
             </TableRow>
           ))}
