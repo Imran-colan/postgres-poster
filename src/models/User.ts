@@ -1,13 +1,12 @@
 import { z } from "zod";
 import { IModel } from "./common/types";
 
-export interface IUser extends IModel {
-  name: string;
-  email: string;
-}
+
 export interface CreateUserInput {
   name: string;
   email: string;
+  avatar?: Uint8Array<ArrayBuffer> | null;
+  avatarMime?: string | null;
 }
 /******************************************************************************
                                  Constants
@@ -27,6 +26,8 @@ const DEFAULT_USER_VALS = (): IUser => ({
 export interface IUser extends IModel {
   name: string;
   email: string;
+  avatar?: Uint8Array<ArrayBuffer> | null;
+  avatarMime?: string | null;
 }
 
 /******************************************************************************
@@ -35,21 +36,33 @@ export interface IUser extends IModel {
 
 // Initialize the "parseUser" function
 export const UserSchema = z.object({
-  id: z.number().int().min(-1),
+  id: z.number().int().min(-1).default(0),
   name: z.string(),
   email: z.email().or(z.string()),
   created: z.preprocess(
     (arg) =>
       typeof arg === "string" || arg instanceof Date ? new Date(arg) : arg,
-    z.date(),
+    z.date().default(() => new Date()),
   ),
-  avatar: z.string().optional(),
+  avatar: z.union([
+    z.string(),
+    z.instanceof(Uint8Array), 
+    z.custom<Buffer>((val) => Buffer.isBuffer(val), "Input not instance of Buffer")
+  ]).nullish().transform(val => {
+    if (typeof val === 'string') return Buffer.from(val) as unknown as Uint8Array<ArrayBuffer>;
+    return val as unknown as Uint8Array<ArrayBuffer>;
+  }),
   avatarMime: z.string().optional(),
 });
 
 export const CreateUserSchema = z.object({
   name: z.string().min(1),
   email: z.email(),
+  avatar: z
+    .instanceof(Uint8Array)
+    .optional()
+    .nullable(),
+  avatarMime: z.string().optional().nullable(),
 });
 
 /******************************************************************************

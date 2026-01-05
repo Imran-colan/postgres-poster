@@ -40,6 +40,8 @@ function displayUsers() {
           createdFormatted: formatDate(user.created),
         })),
       });
+
+      console.log(resp.users);
     });
 }
 

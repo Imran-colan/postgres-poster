@@ -25,16 +25,27 @@ const Validators = {
  */
 async function getAll(_: IReq, res: IRes) {
   const users = await UserService.getAll();
-  res.status(HTTP_STATUS_CODES.Ok).json({ users });
+  const formattedUsers = users.map((u) => ({
+    ...u,
+    avatar: u.avatar
+      ? `data:${u.avatarMime};base64,${Buffer.from(u.avatar).toString("base64")}`
+      : null,
+  }));
+  res.status(HTTP_STATUS_CODES.Ok).json({ users: formattedUsers });
 }
 
 /**
  * Add one user.
  */
 async function add(req: IReq, res: IRes) {
-  const { user } = Validators.add(req.body);
-  await UserService.addOne(user);
-  res.status(HTTP_STATUS_CODES.Created).end();
+  let userData = req.body;
+  if (req.file) {
+    userData.avatar = req.file.buffer as Uint8Array<ArrayBuffer>;
+    userData.avatarMime = req.file.mimetype;
+  }
+  const { user } = Validators.add({ user: userData });
+  const addedUser = await UserService.addOne(user);
+  res.status(HTTP_STATUS_CODES.Created).json({ user: addedUser }).end();
 }
 
 /**
@@ -42,8 +53,12 @@ async function add(req: IReq, res: IRes) {
  */
 async function update(req: IReq, res: IRes) {
   const { user } = Validators.update(req.body);
-  await UserService.updateOne(user);
-  res.status(HTTP_STATUS_CODES.Ok).end();
+  if (req.file) {
+    user.avatar = req.file.buffer as unknown as Uint8Array<ArrayBuffer>;
+    user.avatarMime = req.file.mimetype;
+  }
+  const updatedUser = await UserService.updateOne(user);
+  res.status(HTTP_STATUS_CODES.Ok).json({ user: updatedUser }).end();
 }
 
 /**
@@ -51,8 +66,8 @@ async function update(req: IReq, res: IRes) {
  */
 async function delete_(req: IReq, res: IRes) {
   const { id } = Validators.delete(req.params);
-  await UserService.delete(id);
-  res.status(HTTP_STATUS_CODES.Ok).end();
+  const deletedUser = await UserService.delete(id);
+  res.status(HTTP_STATUS_CODES.Ok).json({ user: deletedUser }).end();
 }
 
 /******************************************************************************

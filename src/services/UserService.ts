@@ -24,14 +24,14 @@ function getAll(): Promise<IUser[]> {
 /**
  * Add one user.
  */
-function addOne(user: CreateUserInput): Promise<void> {
+function addOne(user: CreateUserInput): Promise<IUser> {
   return UserRepo.add(user);
 }
 
 /**
  * Update one user.
  */
-async function updateOne(user: IUser): Promise<void> {
+async function updateOne(user: IUser): Promise<IUser> {
   const persists = await UserRepo.persists(user.id);
   if (!persists) {
     throw new RouteError(HTTP_STATUS_CODES.NotFound, USER_NOT_FOUND_ERR);
@@ -43,7 +43,7 @@ async function updateOne(user: IUser): Promise<void> {
 /**
  * Delete a user by their id.
  */
-async function _delete(id: number): Promise<void> {
+async function _delete(id: number): Promise<IUser> {
   const persists = await UserRepo.persists(id);
   if (!persists) {
     throw new RouteError(HTTP_STATUS_CODES.NotFound, USER_NOT_FOUND_ERR);

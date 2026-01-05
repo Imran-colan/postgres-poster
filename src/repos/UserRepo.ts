@@ -37,27 +37,35 @@ async function getAll(): Promise<IUser[]> {
 /**
  * Add one user.
  */
-async function add(user: CreateUserInput): Promise<void> {
-  await db.user.create({ data: user });
+async function add(user: CreateUserInput): Promise<IUser> {
+  const { id, ...userWithoutId } = user as any;
+  const addedUser = await db.user.create({ data: userWithoutId as any });
+  return addedUser;
 }
 
 /**
  * Update a user.
  */
-async function update(user: IUser): Promise<void> {
-  await db.user.update({
+async function update(user: IUser): Promise<IUser> {
+  if (user.avatar && user.avatarMime) {
+    user.avatar = Buffer.from(Object.values(user.avatar));
+    user.avatarMime = user.avatarMime;
+  }
+  const updatedUser = await db.user.update({
     where: { id: user.id },
-    data: user,
+    data: user as any,
   });
+  return updatedUser;
 }
 
 /**
  * Delete one user.
  */
-async function delete_(id: number): Promise<void> {
-  await db.user.delete({
+async function delete_(id: number): Promise<IUser> {
+  const deletedUser = await db.user.delete({
     where: { id },
   });
+  return deletedUser;
 }
 
 // **** Unit-Tests Only **** //
@@ -76,7 +84,7 @@ async function deleteAllUsers(): Promise<void> {
 async function insertMult(users: IUser[] | readonly IUser[]): Promise<IUser[]> {
   const usersF = [...users];
   for (const user of usersF) {
-    await db.user.create({ data: user });
+    await db.user.create({ data: user as any });
   }
   return usersF;
 }
